@@ -1,29 +1,34 @@
 import requests
 import pandas as pd
 
-def get_btc_data(interval="1h", limit=100):
-    url = "https://api.binance.com/api/v3/klines"
+def get_btc_data(interval=60, limit=100):
+    # Kraken interval is in minutes: 1, 5, 15, 30, 60, 240, 1440, etc.
+    url = "https://api.kraken.com/0/public/OHLC"
     params = {
-        "symbol": "BTCUSDT",
-        "interval": interval,  # e.g. 1h, 4h, 1d
-        "limit": limit          # number of candles
+        "pair": "XBTUSD",
+        "interval": interval
     }
     response = requests.get(url, params=params)
     data = response.json()
 
-    df = pd.DataFrame(data, columns=[
-        "open_time", "open", "high", "low", "close", "volume",
-        "close_time", "quote_asset_volume", "trades",
-        "taker_buy_base", "taker_buy_quote", "ignore"
+    if data.get("error"):
+        raise Exception(f"Kraken API error: {data['error']}")
+
+    result_key = [k for k in data["result"].keys() if k != "last"][0]
+    rows = data["result"][result_key]
+
+    df = pd.DataFrame(rows, columns=[
+        "time", "open", "high", "low", "close", "vwap", "volume", "count"
     ])
 
-    # Convert types
-    df["open_time"] = pd.to_datetime(df["open_time"], unit="ms")
+    df["time"] = pd.to_datetime(df["time"], unit="s")
     for col in ["open", "high", "low", "close", "volume"]:
         df[col] = df[col].astype(float)
 
-    df.set_index("open_time", inplace=True)
-    return df[["open", "high", "low", "close", "volume"]]
+    df.set_index("time", inplace=True)
+    df = df[["open", "high", "low", "close", "volume"]]
+
+    return df.tail(limit)
 
 if __name__ == "__main__":
     df = get_btc_data()
