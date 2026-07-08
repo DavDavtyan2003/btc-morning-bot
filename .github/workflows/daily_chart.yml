@@ -2,7 +2,7 @@ name: Daily BTC Chart
 
 on:
   schedule:
-    - cron: "0 22 * * *" # 9 AM Spain time (UTC+2 in summer) = 7 AM UTC
+    - cron: "5 * * * *" # 5 min after every hourly candle close (UTC) = 7 AM UTC
   workflow_dispatch: # lets you manually trigger it too, for testing
 
 jobs:

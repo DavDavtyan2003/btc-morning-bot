@@ -14,7 +14,7 @@ def send_chart():
     url = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
     with open(chart_path, "rb") as photo:
         files = {"photo": photo}
-        data = {"chat_id": CHAT_ID, "caption": "📊 BTC/USDT — Last 100 Hours"}
+        data = {"chat_id": CHAT_ID, "caption": "📊 BTC/USDT — 🕐 1H candle closed"}
         response = requests.post(url, files=files, data=data)
 
     print(response.status_code, response.text)
