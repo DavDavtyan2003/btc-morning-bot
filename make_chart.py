@@ -2,7 +2,7 @@ import mplfinance as mpf
 from fetch_data import get_btc_data
 
 def create_chart(filename="btc_chart.png"):
-    df = get_btc_data(interval="1h", limit=100)
+    df = get_btc_data(interval=60, limit=100)
 
     mpf.plot(
         df,
